@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
+import Product from "./models/productModel.js";
 
 const app = express();
 app.use(express.json());
@@ -13,102 +14,111 @@ const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI);
         console.log("MongoDb connected successfully");
+        app.listen(port, () => {
+            console.log(`the server is running on port ${port}`);
+        });
     } catch (error) {
         console.log("MongoDB coudn't be connected to\n", error.message);
     }
 };
 connectDB();
 
-let ids = 101;
-
-let products = [
-    {
-        id: ids++,
-        name: "joy Bracelet",
-        price: 300,
-    },
-
-    {
-        id: ids++,
-        name: "happy Anklet",
-        price: 400,
-    },
-
-    {
-        id: ids++,
-        name: "shine Showpiece",
-        price: 3000,
-    },
-];
-
-
 app.get("/", (req, res) => {
     return res.status(200).send("Welcome to CraftConnect");
 });
 
-app.get("/products", (req, res) => {
-    return res.status(200).json(products);
+app.get("/products", async (req, res) => {
+    try {
+        const products = await Product.find();
+        return res.status(200).json(products);
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal Server error",
+        });
+    }
 });
-
-app.get("/products/:id", (req, res) => {
-    const { id } = req.params;
-    const product = products.find((product) => product.id === parseInt(id));
-    if (product) return res.status(200).json(product);
-    else
+app.get("/products/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const products = await Product.findById(id);
+        if (products !== null) return res.status(200).json(products);
         return res.status(404).json({
             message: "Product not found",
         });
-});
-
-app.post("/products", (req, res) => {
-    console.log(req.body);
-    const { name, price } = req.body;
-    const product = {
-        id: ids++,
-        name,
-        price,
-    };
-    products.push(product);
-
-    return res.status(201).json({
-        message: "Product added successfully",
-        product: product,
-    });
-});
-
-app.put("/products/:id", (req, res) => {
-    const { id } = req.params;
-    const product = products.find((product) => product.id === parseInt(id));
-    const { name, price } = req.body;
-    if (product) {
-        product.name = name;
-        product.price = price;
-        return res.status(200).json({
-            message: "Product updated successfully",
+    } catch (error) {
+        res.status(400).json({
+            message: "Bad request",
+            error: error.message,
         });
     }
-    return res.status(404).json({
-        message: "product not found",
-    });
 });
 
-app.delete("/products/:id", (req, res) => {
-    const { id } = req.params;
-    const product = products.find((product) => product.id === parseInt(id));
-    products = products.filter((product) => product.id !== parseInt(id));
+app.post("/products", async (req, res) => {
+    try {
+        console.log(req.body);
+        const { name, price, category } = req.body;
 
-    if (product)
-        return res.status(204).json({
-            //used for no content
-            message: "Product deleted successfully",
+        const product = await Product.create({
+            name,
+            price,
+            category,
         });
-    return res.status(404).json({
-        message: "product not found",
-    });
+
+        if (product)
+            return res.status(201).json({
+                message: "Product added successfully",
+                product: product,
+            });
+    } catch (error) {
+        res.status(400).json({
+            message: "Bad request",
+            error: error.message,
+        });
+    }
 });
 
+app.put("/products/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, price,category} = req.body;
+        const product = await Product.findByIdAndUpdate(
+            id,
+            { name, price, category },
+            { returnDocument: "after" },
+        ); //new:true means updated object willl be returned
+        if (product !== null) {
+            return res.status(200).json({
+                message: "Product updated successfully",
+            });
+        }
+        return res.status(404).json({
+            message: "product not found",
+        });
+    } catch (error) {
+        res.status(400).json({
+            message: "Bad request",
+            error: error.message,
+        });
+    }
+});
 
+app.delete("/products/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findByIdAndDelete(id);
 
-app.listen(port, () => {
-    console.log(`the server is running on port ${port}`);
+        if (product !== null)
+            return res.status(204).json({
+                //used for no content
+                message: "Product deleted successfully",
+            });
+        return res.status(404).json({
+            message: "product not found",
+        });
+    } catch (error) {
+        res.status(400).json({
+            message: "bad request",
+            error: error.message,
+        });
+    }
 });
