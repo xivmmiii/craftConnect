@@ -1,10 +1,23 @@
-import 'dotenv/config'
+import "dotenv/config";
 import express from "express";
+import mongoose from "mongoose";
 
 const app = express();
 app.use(express.json());
 
 const port = 5000;
+
+////////////////////////////////////////////// DB SETUP /////////////////////////////////////////////
+
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
+        console.log("MongoDb connected successfully");
+    } catch (error) {
+        console.log("MongoDB coudn't be connected to\n", error.message);
+    }
+};
+connectDB();
 
 let ids = 101;
 
@@ -27,6 +40,7 @@ let products = [
         price: 3000,
     },
 ];
+
 
 app.get("/", (req, res) => {
     return res.status(200).send("Welcome to CraftConnect");
@@ -84,13 +98,16 @@ app.delete("/products/:id", (req, res) => {
     products = products.filter((product) => product.id !== parseInt(id));
 
     if (product)
-        return res.status(204).json({                //used for no content
+        return res.status(204).json({
+            //used for no content
             message: "Product deleted successfully",
         });
     return res.status(404).json({
         message: "product not found",
     });
 });
+
+
 
 app.listen(port, () => {
     console.log(`the server is running on port ${port}`);
