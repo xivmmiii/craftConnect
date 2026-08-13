@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import Product from "./models/productModel.js";
+import User from "./models/userModel.js";
 
 const app = express();
 app.use(express.json());
@@ -80,7 +81,7 @@ app.post("/products", async (req, res) => {
 app.put("/products/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, price,category} = req.body;
+        const { name, price, category } = req.body;
         const product = await Product.findByIdAndUpdate(
             id,
             { name, price, category },
@@ -118,6 +119,34 @@ app.delete("/products/:id", async (req, res) => {
     } catch (error) {
         res.status(400).json({
             message: "bad request",
+            error: error.message,
+        });
+    }
+});
+
+app.post("/signup", async (req, res) => {
+    try {
+        const { name, emailID, password, role, shippingAddress, shopName } =
+            req.body;
+        const user = await User.create({
+            name,
+            emailID,
+            password,
+            role,
+            shippingAddress,
+            shopName,
+        });
+        if (user)
+            return res.status(201).json({
+                name: name,
+                emailID: emailID,
+                role: role,
+                shippingAddress: shippingAddress,
+                shopName: shopName,
+            });
+    } catch (error) {
+        res.status(400).json({
+            message: "user not created",
             error: error.message,
         });
     }
