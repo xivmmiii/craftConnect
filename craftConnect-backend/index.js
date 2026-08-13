@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 import Product from "./models/productModel.js";
 import User from "./models/userModel.js";
 
@@ -147,6 +148,31 @@ app.post("/signup", async (req, res) => {
     } catch (error) {
         res.status(400).json({
             message: "user not created",
+            error: error.message,
+        });
+    }
+});
+
+app.post("/signin", async (req, res) => {
+    try {
+        const { emailID, password } = req.body;
+        const user = await User.findOne({ emailID });
+        if (user) {
+            const password_matches = await bcrypt.compare(
+                password,
+                user.password,
+            );
+            if (password_matches)
+                return res.status(200).json({
+                    message: "sign in successful",
+                });
+        }
+        return res.status(401).json({
+            message: "wrong id or password",
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: "login unsuccessful",
             error: error.message,
         });
     }
