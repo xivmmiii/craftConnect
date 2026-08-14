@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import Product from "./models/productModel.js";
 import User from "./models/userModel.js";
+import verifyToken from "./middleware/verifyToken.js";
+import jwt from "jsonwebtoken";
 
 const app = express();
 app.use(express.json());
@@ -55,15 +57,22 @@ app.get("/products/:id", async (req, res) => {
     }
 });
 
-app.post("/products", async (req, res) => {
+app.post("/products", verifyToken, async (req, res) => {
     try {
-        console.log(req.body);
+        const role = req.user.role;
+        if (role !== "seller")
+            return res.status(403).json({
+                message: "Forbidden: Only sellers can add products",
+            });
+
         const { name, price, category } = req.body;
+        const sellerID = req.user.id;
 
         const product = await Product.create({
             name,
             price,
             category,
+            sellerID,
         });
 
         if (product)
@@ -162,10 +171,17 @@ app.post("/signin", async (req, res) => {
                 password,
                 user.password,
             );
-            if (password_matches)
+            if (password_matches) {
+                const token = jwt.sign(
+                    { id: user._id, role: user.role },
+                    process.env.JWT_SECRET,
+                    { expiresIn: "7d" },
+                );
                 return res.status(200).json({
                     message: "sign in successful",
+                    token: token,
                 });
+            }
         }
         return res.status(401).json({
             message: "wrong id or password",
