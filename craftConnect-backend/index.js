@@ -11,10 +11,23 @@ import jwt from "jsonwebtoken";
 const app = express();
 app.use(express.json());
 
+////////////////////////////////////////////// set up db and start server /////////////////////////////////////////////
 
-////////////////////////////////////////////// DB SETUP /////////////////////////////////////////////
+const startServer = async () => {
+    try {
+        await connectDB();
+        app.listen(process.env.PORT, () => {
+            console.log(`Server is listening to the port ${process.env.PORT}`);
+        });
+    } catch (error) {
+        res.status(400).json({
+            message: "erroc connecting to the db",
+            error: error.message,
+        });
+    }
+};
 
-connectDB(app);
+startServer()
 
 app.get("/", (req, res) => {
     return res.status(200).send("Welcome to CraftConnect");
