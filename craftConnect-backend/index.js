@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import connectDB from "./config/db.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import Product from "./models/productModel.js";
@@ -10,22 +11,10 @@ import jwt from "jsonwebtoken";
 const app = express();
 app.use(express.json());
 
-const port = 5000;
 
 ////////////////////////////////////////////// DB SETUP /////////////////////////////////////////////
 
-const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log("MongoDb connected successfully");
-        app.listen(port, () => {
-            console.log(`the server is running on port ${port}`);
-        });
-    } catch (error) {
-        console.log("MongoDB coudn't be connected to\n", error.message);
-    }
-};
-connectDB();
+connectDB(app);
 
 app.get("/", (req, res) => {
     return res.status(200).send("Welcome to CraftConnect");
