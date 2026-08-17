@@ -61,7 +61,40 @@ export const addItem = async (req, res) => {
         });
     }
 };
-export const removeItem = async () => {};
+export const removeItem = async (req, res) => {
+    try {
+        const buyerID = req.user.id;
+        const cart = await Cart.findOne({ buyerID: buyerID });
+        if (!cart)
+            return res.status(404).json({
+                message: "cart is empty. nothing to remove",
+            });
+
+        const { id } = req.params;
+        console.log(req.params);
+        const product = cart.items.find(
+            (item) => item.productID.toString() === id,
+        );
+        if (!product)
+            return res.status(404).json({
+                message: " product not found",
+            });
+
+        product.qty--;
+        if (product.qty === 0)
+            cart.items = cart.items.filter(
+                (item) => item.productID.toString() !== id,
+            );
+
+        await cart.save();
+        return res.status(200).json({
+            message: " product deleted",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "internal server error",
+            error: error.message,
+        });
+    }
+};
 export const clearCart = async () => {};
-
-
