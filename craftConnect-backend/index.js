@@ -3,6 +3,7 @@ import express from "express";
 import connectDB from "./config/db.js";
 import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import cartRoutes from './routes/cartRoutes.js'
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import Product from "./models/productModel.js";
@@ -32,8 +33,13 @@ const startServer = async () => {
 startServer();
 app.use("/products", productRoutes);
 app.use("/user", userRoutes);
+app.use("/cart", cartRoutes);
 
-app.get("/", (req, res) => {
+app.get("/", (req, res) => {    
     return res.status(200).send("Welcome to CraftConnect");
+
+
 });
+
+
 

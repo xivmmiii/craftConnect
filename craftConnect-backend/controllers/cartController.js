@@ -1,9 +1,24 @@
 import Cart from "../models/cartModel.js";
 
-const updateItem = async () => {};
-const viewCart = async (req, res) => {
-    const items=Cart.li
+export const viewCart = async (req, res) => {
+    try {
+        const buyerID = req.user.id;
+        const cart = await Cart.findOne({ buyerID: buyerID });
+        if (!cart)
+            return res.status(404).json({
+                message: "cart is empty",
+            });
+        const items = cart.items;
+        return res.status(200).json({
+            items: items,
+        });
+    } catch (error) {
+        return res.status(400).json({
+            message: "bad request",
+            error: error.message,
+        });
+    }
 };
-const addItem = async () => {};
-const removeItem = async () => {};
-const clearCart = async () => {};
+export const addItem = async () => {};
+export const removeItem = async () => {};
+export const clearCart = async () => {};
