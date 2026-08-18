@@ -18,6 +18,10 @@ const productSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
+    stock: {
+        required: true,
+        type: Number,
+    },
 });
 
 const Product = mongoose.model("Product", productSchema);
