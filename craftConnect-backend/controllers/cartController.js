@@ -97,4 +97,25 @@ export const removeItem = async (req, res) => {
         });
     }
 };
-export const clearCart = async () => {};
+export const clearCart = async (req, res) => {
+    try {
+        const buyerID = req.user.id;
+        const cart = await Cart.findOne({
+            buyerID: buyerID,
+        });
+        if (!cart)
+            return res.status(404).json({
+                message: "cart not found",
+            });
+        cart.items = [];
+        await cart.save();
+        return res.status(200).json({
+            message: "cart cleared",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "internal bad server",
+            error: error.message,
+        });
+    }
+};
