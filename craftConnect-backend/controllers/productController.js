@@ -35,7 +35,7 @@ export const createProduct = async (req, res) => {
                 message: "Forbidden: Only sellers can add products",
             });
 
-        const { name, price, category } = req.body;
+        const { name, price, category, stock } = req.body;
         const sellerID = req.user.id;
 
         const product = await Product.create({
@@ -43,6 +43,7 @@ export const createProduct = async (req, res) => {
             price,
             category,
             sellerID,
+            stock,
         });
 
         if (product)
@@ -58,7 +59,7 @@ export const createProduct = async (req, res) => {
     }
 };
 
-export const updateProduct= async (req, res) => {
+export const updateProduct = async (req, res) => {
     try {
         const role = req.user.role;
 
@@ -76,10 +77,11 @@ export const updateProduct= async (req, res) => {
                     message: "Forbidden: You can only delete your own products",
                 });
             }
-            const { name, price, category } = req.body;
+            const { name, price, category, stock } = req.body;
             product.name = name || product.name;
             product.price = price || product.price;
             product.category = category || product.category;
+            product.stock = stock || product.stock;
             await product.save();
             return res.status(200).json({
                 message: "Product updated successfully",
