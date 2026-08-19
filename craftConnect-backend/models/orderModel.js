@@ -31,13 +31,13 @@ const orderSchema = mongoose.Schema({
         type: Date,
     },
     paymentMode: {
+        type: String,
         enum: ["COD", "UPI", "netbanking", "card"],
         required: true,
     },
     rating: {
         type: Number,
-        enum: [1, 2, 3, 4, 5],
-        required: true,
+        enum: [1, 2, 3, 4, 5],        
     },
 });
 
