@@ -35,7 +35,7 @@ startServer();
 app.use("/product", productRoutes);
 app.use("/user", userRoutes);
 app.use("/cart", cartRoutes);
-app.use("/checkout", orderRoutes);
+app.use("/order", orderRoutes);
 
 app.get("/", (req, res) => {
     return res.status(200).send("Welcome to CraftConnect");

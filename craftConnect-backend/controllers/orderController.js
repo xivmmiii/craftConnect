@@ -52,3 +52,24 @@ export const checkout = async (req, res) => {
         });
     }
 };
+
+export const BuyerViewOrders = async (req, res) => {
+    try {
+        const buyerID = req.user.id;
+        const orders = await Order.find({ buyerID: buyerID });
+        if (orders)
+            return res.status(200).json({
+                orders: orders,
+            });
+        return res.status(404).json({
+            message: "no order history",
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "internal server error",
+            error: error.message,
+        });
+    }
+};
+
+
