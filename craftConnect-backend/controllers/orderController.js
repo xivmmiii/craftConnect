@@ -55,6 +55,11 @@ export const checkout = async (req, res) => {
 
 export const BuyerViewOrders = async (req, res) => {
     try {
+        const role = req.user.role;
+        if (role !== "buyer")
+            return res.status(403).json({
+                message: "unauthorised",
+            });
         const buyerID = req.user.id;
         const orders = await Order.find({ buyerID: buyerID });
         if (orders.length !== 0)
@@ -79,25 +84,14 @@ export const SellerViewOrders = async (req, res) => {
             return res.status(403).json({
                 message: "unauthorised",
             });
-        const list = [];
         const sellerID = req.user.id;
-        const orders = await Order.find({});
-        if (orders.lenght === 0)
-            return res.status(404).json({
-                message: "no order history",
-            });
-        for (const order of orders) {
-            for (const item of order.items) {
-                const orderedProductID = item.productID;
-                const product = await Product.findById(orderedProductID);
-                if (product && product.sellerID.toString() === sellerID) {
-                    list.push(order);
-                    break;
-                }
-            }
-        }
+        const sellerProducts = await Product.find({ sellerID });
+        const productIDs = sellerProducts.map((product) => product._id);
+        const orders = await Order.find({
+            "items.productID": { $in: productIDs },
+        });
         return res.status(200).json({
-            message: list,
+            list_of_orders: orders,
         });
     } catch (error) {
         res.status(500).json({
