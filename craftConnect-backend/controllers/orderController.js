@@ -57,7 +57,7 @@ export const BuyerViewOrders = async (req, res) => {
     try {
         const buyerID = req.user.id;
         const orders = await Order.find({ buyerID: buyerID });
-        if (orders)
+        if (orders.length !== 0)
             return res.status(200).json({
                 orders: orders,
             });
@@ -72,4 +72,36 @@ export const BuyerViewOrders = async (req, res) => {
     }
 };
 
-
+export const SellerViewOrders = async (req, res) => {
+    try {
+        const role = req.user.role;
+        if (role !== "seller")
+            return res.status(403).json({
+                message: "unauthorised",
+            });
+        const list = [];
+        const sellerID = req.user.id;
+        const orders = await Order.find({});
+        if (orders.lenght === 0)
+            return res.status(404).json({
+                message: "no order history",
+            });
+        for (const order of orders) {
+            for (const item of order.items) {
+                const orderedProductID = item.productID;
+                const product = await Product.findById(orderedProductID);
+                if (product && product.sellerID.toString() === sellerID) {
+                    list.push(order);
+                    break;
+                }
+            }
+        }
+        return res.status(200).json({
+            message: list,
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "internal server error",
+        });
+    }
+};
