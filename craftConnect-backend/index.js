@@ -5,12 +5,7 @@ import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
-import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import Product from "./models/productModel.js";
-import User from "./models/userModel.js";
-import verifyToken from "./middleware/verifyToken.js";
-import jwt from "jsonwebtoken";
+import adminRoutes from './routes/adminRoutes.js'
 
 const app = express();
 app.use(express.json());
@@ -36,6 +31,7 @@ app.use("/product", productRoutes);
 app.use("/user", userRoutes);
 app.use("/cart", cartRoutes);
 app.use("/order", orderRoutes);
+app.use("/admin", adminRoutes);
 
 app.get("/", (req, res) => {
     return res.status(200).send("Welcome to CraftConnect");
