@@ -1,12 +1,12 @@
 import User from "../models/userModel.js";
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const signin = async (req, res) => {
     try {
         const { emailID, password } = req.body;
         const user = await User.findOne({ emailID });
-        if (user) {
+        if (user && user.isActive === true) {
             const password_matches = await bcrypt.compare(
                 password,
                 user.password,
