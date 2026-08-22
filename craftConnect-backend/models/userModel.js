@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema({
     shopName: {
         type: String,
     },
+    isActive: {
+        default: true,
+        type: Boolean,
+    },
 });
 
 ////////cannot use arrow function here, because it does not have areference tot his
