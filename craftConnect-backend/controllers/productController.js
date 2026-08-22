@@ -2,7 +2,7 @@ import Product from "../models/productModel.js";
 
 export const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find();
+        const products = await Product.find({ isActive: true });
         return res.status(200).json(products);
     } catch (error) {
         res.status(500).json({
@@ -14,8 +14,9 @@ export const getAllProducts = async (req, res) => {
 export const getProductById = async (req, res) => {
     try {
         const { id } = req.params;
-        const products = await Product.findById(id);
-        if (products !== null) return res.status(200).json(products);
+        const product = await Product.findById(id);
+        if (product !== null && product.isActive === true)
+            return res.status(200).json(product);
         return res.status(404).json({
             message: "Product not found",
         });
@@ -71,7 +72,7 @@ export const updateProduct = async (req, res) => {
         const { id } = req.params;
         const product = await Product.findById(id); //new:true means updated object willl be returned
 
-        if (product !== null) {
+        if (product !== null && product.isActive === true) {
             if (req.user.id !== product.sellerID.toString()) {
                 return res.status(403).json({
                     message: "Forbidden: You can only delete your own products",
@@ -109,13 +110,14 @@ export const deleteProduct = async (req, res) => {
         const { id } = req.params;
         const product = await Product.findById(id);
 
-        if (product !== null) {
+        if ((product !== null && product.isActive) === true) {
             if (req.user.id !== product.sellerID.toString()) {
                 return res.status(403).json({
                     message: "Forbidden: You can only delete your own products",
                 });
             }
-            await Product.findByIdAndDelete(id);
+            product.isActive = false;
+            await product.save();
             return res.status(204).json({
                 //used for no content
                 message: "Product deleted successfully",

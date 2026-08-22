@@ -75,7 +75,7 @@ export const removeSeller = async (req, res) => {
 
         if (seller && seller.role === "seller") {
             seller.isActive = false;
-            seller.save();
+            await seller.save();
             return res.status(200).json({ message: "seller deactivated" });
         }
         return res.status(404).json({ message: "seller not found" });
