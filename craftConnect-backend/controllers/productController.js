@@ -2,8 +2,19 @@ import Product from "../models/productModel.js";
 
 export const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find({ isActive: true });
-        return res.status(200).json(products);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const products = await Product.find({ isActive: true })
+            .skip((page - 1) * limit)
+            .limit(limit);
+        const totalproducts = await Product.countDocuments({ isActive: true });
+
+        return res.status(200).json({
+            products: products,
+            totalProducts: totalproducts,
+            currentPage: page,
+            totalPages: Math.ceil(totalproducts / limit),
+        });
     } catch (error) {
         res.status(500).json({
             message: "Internal Server error",
