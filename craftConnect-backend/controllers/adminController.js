@@ -41,19 +41,21 @@ export const getAllProducts = async (req, res) => {
             return res.status(403).json({
                 message: "unauthorised",
             });
-        const { page, limit, skup } = getPagination(req.query);
+        const { page, limit, skip } = getPagination(req.query);
         const filter = {};
         if (req.query.isActive !== "undefined")
             filter.isActive = req.query.isActive === "true";
         const productList = await Product.find({ filter })
             .skip(skip)
             .limit(limit);
-        const totalProducts = await Product.countDocuments();
+        const totalProducts = await Product.countDocuments({
+            isActive: isActive,
+        });
         return res.status(200).json({
             products: productList,
             totalProducts: totalProducts,
             currentPge: page,
-            totalPages: Math.seil(totalProducts / limit),
+            totalPages: Math.ceil(totalProducts / limit),
         });
     } catch (error) {
         return res.status(500).json({
@@ -67,12 +69,18 @@ export const getAllOrders = async (req, res) => {
         const role = req.user.role;
         if (role !== "admin")
             return res.status(403).json({
-                message: "unathoised",
+                message: "unauthorised",
             });
-
-        const orderList = await Order.find({});
+        const filter = {};
+        const { page, skip, limit } = getPagination(req.query);
+        if (isActive !== "undefined") filter.isActive = isActive === "true";
+        const orderList = await Order.find(filter);
+        const totalOrders = await Order.countDocuments({ isActive: isActive });
         return res.status(200).json({
             orders: orderList,
+            totalOrders: totalOrders,
+            currentPage: page,
+            totalPages: Math.ceil(totalOrders / limit),
         });
     } catch (error) {
         return res.status(500).json({
