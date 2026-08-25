@@ -1,11 +1,11 @@
 import Product from "../models/productModel.js";
+import getPagination from "../utils/pagination.js";
 
 export const getAllProducts = async (req, res) => {
     try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
+        const { page, limit, skip } = getPagination(req.query);
         const products = await Product.find({ isActive: true })
-            .skip((page - 1) * limit)
+            .skip(skip)
             .limit(limit);
         const totalproducts = await Product.countDocuments({ isActive: true });
 
