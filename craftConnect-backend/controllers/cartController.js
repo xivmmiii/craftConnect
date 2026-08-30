@@ -55,10 +55,7 @@ export const addItem = async (req, res) => {
             });
         }
     } catch (error) {
-        res.status(500).json({
-            message: "internal server error",
-            error: error.message,
-        });
+        next(error);
     }
 };
 export const removeItem = async (req, res) => {
@@ -91,10 +88,7 @@ export const removeItem = async (req, res) => {
             message: " product deleted",
         });
     } catch (error) {
-        return res.status(500).json({
-            message: "internal server error",
-            error: error.message,
-        });
+        next(error);
     }
 };
 export const clearCart = async (req, res) => {
@@ -113,9 +107,6 @@ export const clearCart = async (req, res) => {
             message: "cart cleared",
         });
     } catch (error) {
-        return res.status(500).json({
-            message: "internal bad server",
-            error: error.message,
-        });
+        next(error);
     }
 };

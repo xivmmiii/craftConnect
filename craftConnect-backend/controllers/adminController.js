@@ -28,10 +28,7 @@ export const getAllUsers = async (req, res) => {
             totalPages: Math.ceil(totalUsers / limit),
         });
     } catch (error) {
-        return res.status(500).json({
-            message: "internal server error",
-            error: error.message,
-        });
+        next(error);
     }
 };
 export const getAllProducts = async (req, res) => {
@@ -58,10 +55,7 @@ export const getAllProducts = async (req, res) => {
             totalPages: Math.ceil(totalProducts / limit),
         });
     } catch (error) {
-        return res.status(500).json({
-            message: "internal server error",
-            error: error.message,
-        });
+        next(error);
     }
 };
 export const getAllOrders = async (req, res) => {
@@ -83,10 +77,7 @@ export const getAllOrders = async (req, res) => {
             totalPages: Math.ceil(totalOrders / limit),
         });
     } catch (error) {
-        return res.status(500).json({
-            message: "internal server error",
-            error: error.message,
-        });
+        next(error);
     }
 };
 
@@ -108,10 +99,7 @@ export const removeSeller = async (req, res) => {
         }
         return res.status(404).json({ message: "seller not found" });
     } catch (error) {
-        return res.status(500).json({
-            message: "internal server error",
-            error: error.message,
-        });
+        next(error);
     }
 };
 export const removeProduct = async (req, res) => {
@@ -131,9 +119,6 @@ export const removeProduct = async (req, res) => {
             return res.status(200).json({ message: "product deactivated" });
         return res.status(404).json({ message: "product not found" });
     } catch (error) {
-        return res.status(500).json({
-            message: "internal server error",
-            error: error.message,
-        });
+        next(error);
     }
 };

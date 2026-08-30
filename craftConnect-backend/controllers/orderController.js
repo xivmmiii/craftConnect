@@ -46,10 +46,7 @@ export const checkout = async (req, res) => {
             message: "order placed successfully",
         });
     } catch (error) {
-        return res.status(500).json({
-            message: "internal server error",
-            error: error.message,
-        });
+        next(error);
     }
 };
 
@@ -70,10 +67,7 @@ export const BuyerViewOrders = async (req, res) => {
             message: "no order history",
         });
     } catch (error) {
-        return res.status(500).json({
-            message: "internal server error",
-            error: error.message,
-        });
+        next(error);
     }
 };
 
@@ -94,8 +88,6 @@ export const SellerViewOrders = async (req, res) => {
             list_of_orders: orders,
         });
     } catch (error) {
-        res.status(500).json({
-            message: "internal server error",
-        });
+        next(error);
     }
 };

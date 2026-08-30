@@ -16,9 +16,7 @@ export const getAllProducts = async (req, res) => {
             totalPages: Math.ceil(totalproducts / limit),
         });
     } catch (error) {
-        res.status(500).json({
-            message: "Internal Server error",
-        });
+        next(error);
     }
 };
 
@@ -32,10 +30,7 @@ export const getProductById = async (req, res) => {
             message: "Product not found",
         });
     } catch (error) {
-        res.status(400).json({
-            message: "Bad request",
-            error: error.message,
-        });
+        next(error);
     }
 };
 
@@ -64,10 +59,7 @@ export const createProduct = async (req, res) => {
                 product: product,
             });
     } catch (error) {
-        res.status(400).json({
-            message: "Bad request",
-            error: error.message,
-        });
+        next(error);
     }
 };
 
@@ -104,10 +96,7 @@ export const updateProduct = async (req, res) => {
             message: "product not found",
         });
     } catch (error) {
-        res.status(400).json({
-            message: "Bad request",
-            error: error.message,
-        });
+        next(error);
     }
 };
 
@@ -138,9 +127,6 @@ export const deleteProduct = async (req, res) => {
             message: "product not found",
         });
     } catch (error) {
-        res.status(400).json({
-            message: "bad request",
-            error: error.message,
-        });
+        next(error);
     }
 };

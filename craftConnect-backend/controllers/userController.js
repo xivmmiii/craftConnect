@@ -27,10 +27,7 @@ export const signin = async (req, res) => {
             message: "wrong id or password",
         });
     } catch (error) {
-        return res.status(400).json({
-            message: "login unsuccessful",
-            error: error.message,
-        });
+        next(error);
     }
 };
 
@@ -55,9 +52,6 @@ export const signup = async (req, res) => {
                 shopName: shopName,
             });
     } catch (error) {
-        res.status(400).json({
-            message: "user not created",
-            error: error.message,
-        });
+        next(error);
     }
 };
