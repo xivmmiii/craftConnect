@@ -1,9 +1,10 @@
 import User from "../models/userModel.js";
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
-import getPagination from "../utils/pagination.js";
+import { getPagination } from "../utils/pagination.js";
+import AppError from "../utils/AppError.js";
 
-export const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res, next) => {
     try {
         const role = req.user.role;
         if (role !== "admin")
@@ -13,8 +14,8 @@ export const getAllUsers = async (req, res) => {
         const userRole = req.query.role;
         const { page, limit, skip } = getPagination(req.query);
         const filter = {};
-        if (req.query.isActive !== "undefined")
-            filter.isActive = isActive === "true";
+        if (req.query.isActive !== undefined)
+            filter.isActive = req.query.isActive === "true";
         if (userRole) filter.role = userRole;
         const usersList = await User.find(filter)
             .select("-password ")
@@ -31,7 +32,7 @@ export const getAllUsers = async (req, res) => {
         next(error);
     }
 };
-export const getAllProducts = async (req, res) => {
+export const getAllProducts = async (req, res, next) => {
     try {
         const role = req.user.role;
         if (role !== "admin")
@@ -40,25 +41,21 @@ export const getAllProducts = async (req, res) => {
             });
         const { page, limit, skip } = getPagination(req.query);
         const filter = {};
-        if (req.query.isActive !== "undefined")
+        if (req.query.isActive !== undefined)
             filter.isActive = req.query.isActive === "true";
-        const productList = await Product.find({ filter })
-            .skip(skip)
-            .limit(limit);
-        const totalProducts = await Product.countDocuments({
-            isActive: isActive,
-        });
+        const productList = await Product.find(filter).skip(skip).limit(limit);
+        const totalProducts = await Product.countDocuments(filter);
         return res.status(200).json({
             products: productList,
             totalProducts: totalProducts,
-            currentPge: page,
+            currentPage: page,
             totalPages: Math.ceil(totalProducts / limit),
         });
     } catch (error) {
         next(error);
     }
 };
-export const getAllOrders = async (req, res) => {
+export const getAllOrders = async (req, res, next) => {
     try {
         const role = req.user.role;
         if (role !== "admin")
@@ -67,9 +64,9 @@ export const getAllOrders = async (req, res) => {
             });
         const filter = {};
         const { page, skip, limit } = getPagination(req.query);
-        if (isActive !== "undefined") filter.isActive = isActive === "true";
-        const orderList = await Order.find(filter);
-        const totalOrders = await Order.countDocuments({ isActive: isActive });
+        if (req.query.isActive !== undefined) filter.isActive = req.query.isActive === "true";
+        const orderList = await Order.find(filter).skip(skip).limit(limit);
+        const totalOrders = await Order.countDocuments(filter);
         return res.status(200).json({
             orders: orderList,
             totalOrders: totalOrders,
@@ -81,12 +78,12 @@ export const getAllOrders = async (req, res) => {
     }
 };
 
-export const removeSeller = async (req, res) => {
+export const removeSeller = async (req, res, next) => {
     try {
         const role = req.user.role;
         if (role !== "admin")
             return res.status(403).json({
-                message: "unathoised",
+                message: "unauthorised",
             });
         const sellerID = req.params.id;
 
@@ -97,12 +94,12 @@ export const removeSeller = async (req, res) => {
             await seller.save();
             return res.status(200).json({ message: "seller deactivated" });
         }
-        return res.status(404).json({ message: "seller not found" });
+        throw new AppError("Seller not found", 404);
     } catch (error) {
         next(error);
     }
 };
-export const removeProduct = async (req, res) => {
+export const removeProduct = async (req, res, next) => {
     try {
         const role = req.user.role;
         if (role !== "admin")
@@ -117,7 +114,7 @@ export const removeProduct = async (req, res) => {
         );
         if (product)
             return res.status(200).json({ message: "product deactivated" });
-        return res.status(404).json({ message: "product not found" });
+        throw new AppError("Product not found", 404);
     } catch (error) {
         next(error);
     }
