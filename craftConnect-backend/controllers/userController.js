@@ -1,8 +1,9 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import AppError from "../utils/AppError.js";
 
-export const signin = async (req, res) => {
+export const signin = async (req, res, next) => {
     try {
         const { emailID, password } = req.body;
         const user = await User.findOne({ emailID });
@@ -23,15 +24,13 @@ export const signin = async (req, res) => {
                 });
             }
         }
-        return res.status(401).json({
-            message: "wrong id or password",
-        });
+        throw new AppError("Wrong ID or password", 401);
     } catch (error) {
         next(error);
     }
 };
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
     try {
         const { name, emailID, password, role, shippingAddress, shopName } =
             req.body;
