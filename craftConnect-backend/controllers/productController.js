@@ -1,10 +1,11 @@
 import Product from "../models/productModel.js";
-import getPagination from "../utils/pagination.js";
+import AppError from "../utils/AppError.js";
+import {getPagination} from "../utils/pagination.js";
 
-export const getAllProducts = async (req, res) => {
+export const getAllProducts = async (req, res, next) => {
     try {
         const { page, limit, skip } = getPagination(req.query);
-        const products = await Product.find({ isActive: true })
+        const products = await Product.find({ isActive : true })
             .skip(skip)
             .limit(limit);
         const totalproducts = await Product.countDocuments({ isActive: true });
@@ -20,21 +21,19 @@ export const getAllProducts = async (req, res) => {
     }
 };
 
-export const getProductById = async (req, res) => {
+export const getProductById = async (req, res, next) => {
     try {
         const { id } = req.params;
         const product = await Product.findById(id);
         if (product !== null && product.isActive === true)
             return res.status(200).json(product);
-        return res.status(404).json({
-            message: "Product not found",
-        });
+        throw new AppError("Product not found", 404);
     } catch (error) {
         next(error);
     }
 };
 
-export const createProduct = async (req, res) => {
+export const createProduct = async (req, res, next) => {
     try {
         const role = req.user.role;
         if (role !== "seller")
@@ -63,7 +62,7 @@ export const createProduct = async (req, res) => {
     }
 };
 
-export const updateProduct = async (req, res) => {
+export const updateProduct = async (req, res, next) => {
     try {
         const role = req.user.role;
 
@@ -92,15 +91,13 @@ export const updateProduct = async (req, res) => {
             });
         }
 
-        return res.status(404).json({
-            message: "product not found",
-        });
+        throw new AppError("Product not found", 404);
     } catch (error) {
         next(error);
     }
 };
 
-export const deleteProduct = async (req, res) => {
+export const deleteProduct = async (req, res, next) => {
     try {
         const role = req.user.role;
         if (role !== "seller")
@@ -123,9 +120,7 @@ export const deleteProduct = async (req, res) => {
                 message: "Product deleted successfully",
             });
         }
-        return res.status(404).json({
-            message: "product not found",
-        });
+        throw new AppError("Product not found", 404);
     } catch (error) {
         next(error);
     }
