@@ -5,7 +5,7 @@ import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
-import adminRoutes from './routes/adminRoutes.js'
+import adminRoutes from "./routes/adminRoutes.js";
 import errorHandler from "./middleware/errorHandler.js";
 
 const app = express();
@@ -34,8 +34,8 @@ app.use("/cart", cartRoutes);
 app.use("/order", orderRoutes);
 app.use("/admin", adminRoutes);
 
-app.use(errorHandler)
+app.use(errorHandler);
 
-app.get("/", (req, res) => {
+app.get("/", (req, res, next) => {
     return res.status(200).send("Welcome to CraftConnect");
 });
