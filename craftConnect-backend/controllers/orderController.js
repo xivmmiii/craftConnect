@@ -1,25 +1,25 @@
 import Product from "../models/productModel.js";
 import Cart from "../models/cartModel.js";
 import Order from "../models/orderModel.js";
+import AppError from "../utils/AppError.js";
 
-export const checkout = async (req, res) => {
+export const checkout = async (req, res, next) => {
     try {
         const buyerID = req.user.id;
         const cart = await Cart.findOne({
             buyerID: buyerID,
         });
-        if (!cart)
-            return res.status(404).json({
-                message: "cart is empty",
-            });
+        if (!cart) throw new AppError("empty cart", 404);
+
         const order = [];
         const itemsToOrder = cart.items;
         for (const item of itemsToOrder) {
             const product = await Product.findById(item.productID);
             if (product.stock < item.qty)
-                return res.status(404).json({
-                    message: "item out of stock, cannot proceed checkout",
-                });
+                throw new AppError(
+                    "item out of stock, cannot proceed checkout",
+                    400,
+                );
         }
         for (const item of itemsToOrder) {
             const product = await Product.findById(item.productID);
@@ -50,7 +50,7 @@ export const checkout = async (req, res) => {
     }
 };
 
-export const BuyerViewOrders = async (req, res) => {
+export const BuyerViewOrders = async (req, res, next) => {
     try {
         const role = req.user.role;
         if (role !== "buyer")
@@ -63,15 +63,13 @@ export const BuyerViewOrders = async (req, res) => {
             return res.status(200).json({
                 orders: orders,
             });
-        return res.status(404).json({
-            message: "no order history",
-        });
+        throw new AppError("No Order found", 404);
     } catch (error) {
         next(error);
     }
 };
 
-export const SellerViewOrders = async (req, res) => {
+export const SellerViewOrders = async (req, res, next) => {
     try {
         const role = req.user.role;
         if (role !== "seller")
