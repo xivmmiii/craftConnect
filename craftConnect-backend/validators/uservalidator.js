@@ -1,12 +1,10 @@
-import errorHandler from "../middlewares/errorHandler.js";
+import { z } from "zod";
 
-const validate = (schema) => (req, res, next) => {
-    const result = schema.safeParse(req.body);
-    if (!result.suxxess) {
-        const message = result.error.errors.map((err) => err.message).join(",");
-        throw errorHandler(400, message);
-        f;
-    }
-    next();
-};
-export default validate;
+export const signUpSchema = z.object({
+    name: z.string().min(2, "Name is required"),
+    emailID: z.email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    role: z.enum(["buyer", "seller", "admin"]),
+    shippingAddress: z.string().optional(),
+    shopName: z.string().optional(),
+});
