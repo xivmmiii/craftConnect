@@ -43,6 +43,7 @@ export const signup = async (req, res, next) => {
             shopName,
         });
         if (user)
+            console.log(`User created successfully: ${user.name} (${user.emailID})`);
             return res.status(201).json({
                 name: name,
                 emailID: emailID,

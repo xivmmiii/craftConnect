@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import cors from "cors"
 import connectDB from "./config/db.js";
 import productRoutes from "./routes/productRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -28,6 +29,7 @@ const startServer = async () => {
 };
 
 startServer();
+app.use(cors());
 app.use("/product", productRoutes);
 app.use("/user", userRoutes);
 app.use("/cart", cartRoutes);
