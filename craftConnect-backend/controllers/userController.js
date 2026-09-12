@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import AppError from "../utils/AppError.js";
 
-export const signin = async (req, res, next) => {
+export const Signin = async (req, res, next) => {
     try {
         const { emailID, password } = req.body;
         const user = await User.findOne({ emailID });
@@ -30,7 +30,7 @@ export const signin = async (req, res, next) => {
     }
 };
 
-export const signup = async (req, res, next) => {
+export const Signup = async (req, res, next) => {
     try {
         const { name, emailID, password, role, shippingAddress, shopName } =
             req.body;
@@ -43,14 +43,22 @@ export const signup = async (req, res, next) => {
             shopName,
         });
         if (user)
-            console.log(`User created successfully: ${user.name} (${user.emailID})`);
-            return res.status(201).json({
-                name: name,
-                emailID: emailID,
-                role: role,
-                shippingAddress: shippingAddress,
-                shopName: shopName,
-            });
+            console.log(
+                `User created successfully: ${user.name} (${user.emailID})`,
+            );
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" },
+        );
+        return res.status(201).json({
+            name: name,
+            emailID: emailID,
+            role: role,
+            shippingAddress: shippingAddress,
+            shopName: shopName,
+            token: token,
+        });
     } catch (error) {
         next(error);
     }

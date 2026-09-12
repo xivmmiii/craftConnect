@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 import axios from "axios";
 
 export default function Signup() {
@@ -7,12 +9,15 @@ export default function Signup() {
     const [name, setName] = useState("");
     const [role, setRole] = useState("buyer");
 
+    const { login } = useAuth();
+
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
-        console.log('submit clicked')
         e.preventDefault();
         try {
             const response = await axios.post(
-                "http://localhost:5000/user/signup",
+                "http://localhost:5000/user/Signup",
                 {
                     name,
                     emailID,
@@ -20,9 +25,10 @@ export default function Signup() {
                     role,
                 },
             );
-            console.log(response.data);
+            login(response.data.token);
+            navigate("/");
         } catch (error) {
-            console.error("Error occurred while signing up:", error);
+            console.error("Error occurred while Signing up:", error);
         }
     };
 
@@ -74,9 +80,7 @@ export default function Signup() {
                 />
                 <br />
                 <br />
-                <button type="submit">
-                    Sign Up
-                </button>
+                <button type="submit">Sign Up</button>
             </form>
         </>
     );

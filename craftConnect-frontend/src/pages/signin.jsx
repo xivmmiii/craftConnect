@@ -1,25 +1,30 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function Signin() {
     const [emailID, setEmailID] = useState("");
     const [password, setPassword] = useState("");
+
     const navigate = useNavigate();
+
+    const { login } = useAuth();
+
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
             const response = await axios.post(
-                "http://localhost:5000/user/signin",
+                "http://localhost:5000/user/Signin",
                 {
                     emailID,
                     password,
                 },
             );
-            localStorage.setItem("token", response.data.token);
+            login(response.data.token);
             navigate("/");
         } catch (error) {
-            console.error("Error occurred while signing in:", error);
+            console.error("Error occurred while Signing in:", error);
         }
     };
 
