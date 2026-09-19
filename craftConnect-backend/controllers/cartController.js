@@ -1,11 +1,14 @@
 import Cart from "../models/cartModel.js";
 import AppError from "../utils/AppError.js";
+import Product from "../models/productModel.js";
 
 
 export const viewCart = async (req, res, next) => {
     try {
+        if (req.user.role !== "buyer")
+            throw new AppError("Only buyers can access a cart", 403);
         const buyerID = req.user.id;
-        const cart = await Cart.findOne({ buyerID: buyerID });
+        const cart = await Cart.findOne({ buyerID }).populate("items.productID");
         if (!cart)
             throw new AppError("Empty cart", 404);
         const items = cart.items;
@@ -18,7 +21,11 @@ export const viewCart = async (req, res, next) => {
 };
 export const addItem = async (req, res, next) => {
     try {
+        if (req.user.role !== "buyer")
+            throw new AppError("Only buyers can add items to a cart", 403);
         const { productID } = req.body;
+        const product = await Product.findOne({ _id: productID, isActive: true });
+        if (!product) throw new AppError("Product not found", 404);
         const buyerID = req.user.id;
         const cart = await Cart.findOne({ buyerID: buyerID });
 
@@ -57,6 +64,8 @@ export const addItem = async (req, res, next) => {
 };
 export const removeItem = async (req, res, next) => {
     try {
+        if (req.user.role !== "buyer")
+            throw new AppError("Only buyers can modify a cart", 403);
         const buyerID = req.user.id;
         const cart = await Cart.findOne({ buyerID: buyerID });
         if (!cart)
@@ -85,6 +94,8 @@ export const removeItem = async (req, res, next) => {
 };
 export const clearCart = async (req, res, next) => {
     try {
+        if (req.user.role !== "buyer")
+            throw new AppError("Only buyers can modify a cart", 403);
         const buyerID = req.user.id;
         const cart = await Cart.findOne({
             buyerID: buyerID,

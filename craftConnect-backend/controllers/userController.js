@@ -34,6 +34,9 @@ export const Signup = async (req, res, next) => {
     try {
         const { name, emailID, password, role, shippingAddress, shopName } =
             req.body;
+        if (role === "admin") {
+            throw new AppError("Admin accounts cannot be created publicly", 403);
+        }
         const user = await User.create({
             name,
             emailID,

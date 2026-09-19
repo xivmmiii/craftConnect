@@ -11,9 +11,9 @@ const errorHandler = (err, req, res, next) => {
         statusCode = 400;
         message = "Duplicate field value entered";
     }
-    if (err.name === "validation Error") {
+    if (err.name === "ValidationError") {
         statusCode = 400;
-        message = Object.values(err.error)
+        message = Object.values(err.errors)
             .map((val) => val.message)
             .join(", ");
     }

@@ -2,51 +2,66 @@ import Product from "../models/productModel.js";
 import Cart from "../models/cartModel.js";
 import Order from "../models/orderModel.js";
 import AppError from "../utils/AppError.js";
+import mongoose from "mongoose";
 
 export const checkout = async (req, res, next) => {
+    let session;
     try {
+        session = await mongoose.startSession();
+        if (req.user.role !== "buyer")
+            throw new AppError("Only buyers can checkout", 403);
+        const { paymentMode } = req.body;
+        if (!["COD", "UPI", "netbanking", "card"].includes(paymentMode))
+            throw new AppError("Invalid payment mode", 400);
+
         const buyerID = req.user.id;
         const cart = await Cart.findOne({
             buyerID: buyerID,
         });
-        if (!cart) throw new AppError("empty cart", 404);
+        if (!cart || cart.items.length === 0)
+            throw new AppError("Cart is empty", 404);
 
         const order = [];
         const itemsToOrder = cart.items;
-        for (const item of itemsToOrder) {
-            const product = await Product.findById(item.productID);
-            if (product.stock < item.qty)
-                throw new AppError(
-                    "item out of stock, cannot proceed checkout",
-                    400,
-                );
-        }
-        for (const item of itemsToOrder) {
-            const product = await Product.findById(item.productID);
-            const placedItem = {
-                productID: item.productID,
-                price: product.price,
-                qty: item.qty,
-            };
-            order.push(placedItem);
-            product.stock = product.stock - item.qty;
-            await product.save();
-        }
-        const { paymentMode } = req.body;
+        await session.withTransaction(async () => {
+            for (const item of itemsToOrder) {
+                const product = await Product.findOne({
+                    _id: item.productID,
+                    isActive: true,
+                }).session(session);
+                if (!product || product.stock < item.qty)
+                    throw new AppError(
+                        "An item is unavailable or out of stock",
+                        400,
+                    );
+                order.push({
+                    productID: item.productID,
+                    price: product.price,
+                    qty: item.qty,
+                });
+                product.stock -= item.qty;
+                await product.save({ session });
+            }
 
-        await Order.create({
-            items: order,
-            buyerID,
-            orderDate: new Date(),
-            paymentMode: paymentMode,
+            await Order.create(
+                [{
+                    items: order,
+                    buyerID,
+                    orderDate: new Date(),
+                    paymentMode,
+                }],
+                { session },
+            );
+            cart.items = [];
+            await cart.save({ session });
         });
-        cart.items = [];
-        await cart.save();
         return res.status(200).json({
             message: "order placed successfully",
         });
     } catch (error) {
         next(error);
+    } finally {
+        if (session) await session.endSession();
     }
 };
 

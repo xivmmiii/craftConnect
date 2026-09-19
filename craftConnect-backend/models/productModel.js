@@ -8,6 +8,7 @@ const productSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true,
+        min: 0,
     },
     category: {
         type: String,
@@ -21,6 +22,7 @@ const productSchema = new mongoose.Schema({
     stock: {
         required: true,
         type: Number,
+        min: 0,
     },
     isActive: {
         type: Boolean,

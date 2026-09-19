@@ -81,10 +81,10 @@ export const updateProduct = async (req, res, next) => {
                 });
             }
             const { name, price, category, stock } = req.body;
-            product.name = name || product.name;
-            product.price = price || product.price;
-            product.category = category || product.category;
-            product.stock = stock || product.stock;
+            product.name = name ?? product.name;
+            product.price = price ?? product.price;
+            product.category = category ?? product.category;
+            product.stock = stock ?? product.stock;
             await product.save();
             return res.status(200).json({
                 message: "Product updated successfully",
