@@ -49,13 +49,6 @@ export default function DashboardLayout() {
                             <a href="#orders">Orders</a>                            
                         </>
                     )}
-                    {user?.role === "admin" && (
-                        <>
-                            <NavLink to="/admin">Overview</NavLink>
-                            <a href="#products">Products</a>
-                            <a href="#orders">Orders</a>
-                        </>
-                    )}
                 </nav>
               
                 <div className="dashboard-account">

@@ -8,6 +8,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import DashboardLayout from "./pages/DashboardLayout";
 import ProtectedRoute from "./pages/ProtectedRoute";
 import { ForgotPassword, ResetPassword } from "./pages/AccountEmail.jsx";
+import { AdminSignin, AdminSignup } from "./pages/AdminAuth.jsx";
 import {
     CartPage,
     CheckoutPage,
@@ -21,6 +22,8 @@ export default function App() {
             <Routes>
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/signin" element={<Signin />} />
+                <Route path="/admin/signin" element={<AdminSignin />} />
+                <Route path="/admin/signup" element={<AdminSignup />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/" element={<Home />} />

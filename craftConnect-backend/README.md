@@ -35,6 +35,8 @@ Authentication uses an httpOnly `cc_session` cookie set by sign-up and sign-in. 
 | GET | `/order/view/buyer` | Buyer | List buyer orders |
 | GET | `/order/view/seller` | Seller | List orders containing the seller’s products |
 | GET | `/admin/summary` | Admin | Get dashboard totals |
+| POST | `/admin/signup` | Public, needs setup key | Create an admin account with `{ name, email, password, setupKey }`; `setupKey` must equal the server's `ADMIN_SIGNUP_KEY` (route is off when unset) |
+| POST | `/admin/signin` | Public | Sign in; only admin accounts are accepted |
 | GET | `/admin/user`, `/admin/product`, `/admin/order` | Admin | List paginated records, newest first (filters: `role`, `isActive`, `status`) |
 | POST / PUT / DELETE | `/admin/user`, `/admin/user/:id` | Admin | Create, edit, or delete a member. A password change signs them out; deleting keeps their orders and hides their listings |
 | PUT | `/admin/user/:id/deactivate`, `/admin/user/:id/activate` | Admin | Deactivate or reactivate a buyer or seller; a deactivated seller's listings are hidden |

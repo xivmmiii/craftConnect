@@ -27,8 +27,15 @@ import {
     adminCreateOrderSchema,
     adminUpdateOrderSchema,
 } from "../validators/adminValidator.js";
+import { AdminSignin, AdminSignup } from "../controllers/userController.js";
+import { adminSignUpSchema, signInSchema } from "../validators/uservalidator.js";
 
 const router = express.Router();
+
+// Public: registered before the admin-only guard below.
+router.post("/signup", validate(adminSignUpSchema), AdminSignup);
+router.post("/signin", validate(signInSchema), AdminSignin);
+
 router.use(verifyToken, requireRole("admin"));
 
 router.get("/summary", getDashboardSummary);

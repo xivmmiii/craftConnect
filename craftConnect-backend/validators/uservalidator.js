@@ -32,6 +32,15 @@ export const signInSchema = requireEmail(
     }),
 );
 
+export const adminSignUpSchema = requireEmail(
+    z.object({
+        ...emailFields,
+        name: z.string().trim().min(2, "Name is required").max(80),
+        password: newPassword,
+        setupKey: z.string().min(1, "Admin setup key is required").max(200),
+    }),
+);
+
 export const signUpSchema = requireEmail(
     z.object({
         ...emailFields,

@@ -35,10 +35,13 @@ body {
 }
 .auth-brand,
 .auth-aside,
-.auth-card h1,
 .dashboard-brand,
 .profile-mini strong {
     color: #fff7c5;
+}
+/* The card is cream, so its heading needs the dark ink colour to be visible. */
+.auth-card h1 {
+    color: #4f252e;
 }
 .auth-brand span {
     color: #f4ae52;
