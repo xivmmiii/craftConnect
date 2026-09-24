@@ -30,7 +30,10 @@ export function ProductGrid({ compact = false }) {
     const addProduct = async (product) => {
         if (user?.role !== "buyer") {
             if (!user) navigate("/signin");
-            else setRequestError("Shopping bags are available for buyer accounts.");
+            else
+                setRequestError(
+                    "Shopping bags are available for buyer accounts.",
+                );
             return;
         }
         setNotice("");
@@ -49,66 +52,112 @@ export function ProductGrid({ compact = false }) {
         <div
             className={`product-grid ${compact ? "product-grid-compact" : ""}`}
         >
-            {loading && <p className="shop-state">Finding thoughtful things…</p>}
-            {!loading && error && <p className="shop-state shop-state-error" role="alert">{error}</p>}
-            {!loading && !error && listings.length === 0 && <p className="shop-state">Nothing in the collection just yet. Check back soon.</p>}
+            {loading && (
+                <p className="shop-state">Finding thoughtful things…</p>
+            )}
+            {!loading && error && (
+                <p className="shop-state shop-state-error" role="alert">
+                    {error}
+                </p>
+            )}
+            {!loading && !error && listings.length === 0 && (
+                <p className="shop-state">
+                    Nothing in the collection just yet. Check back soon.
+                </p>
+            )}
             {listings.map((product, index) => {
-                const quantity = user?.role === "buyer"
-                    ? cart.find((item) => item.id === product._id)?.quantity || 0
-                    : 0;
+                const quantity =
+                    user?.role === "buyer"
+                        ? cart.find((item) => item.id === product._id)
+                              ?.quantity || 0
+                        : 0;
                 const pending = pendingProductId === product._id;
                 return (
                     <article className="shop-card" key={product._id}>
-                    <Link
-                        to="/products"
-                        className={`product-art ${product.art}`}
-                        aria-label={`View ${product.name}`}
-                    >
-                        <img className="product-photo" src={product.imageUrl || products[index % products.length].image} alt={product.name} loading="lazy" />
-                        <span className="art-index">
-                            0{index + 1} / made with care
-                        </span>
-                        <span className="art-orbit" />
-                    </Link>
-                    <div className="product-details">
-                        <div>
-                            <span className="product-maker">
-                                {product.sellerID?.shopName || product.sellerID?.name || "Independent maker"} · {product.category}
-                            </span>
-                            <h3>{product.name}</h3>
-                        </div>
-                        <strong>{formatPrice(product.price)}</strong>
-                    </div>
-                    {quantity > 0 ? (
-                        <div className="product-bag-quantity" role="group" aria-label={`${product.name} quantity in bag`}>
-                            <button
-                                type="button"
-                                aria-label={`Remove one ${product.name}`}
-                                disabled={pending}
-                                onClick={() => changeQuantity(product, quantity - 1)}
-                            >−</button>
-                            <span aria-live="polite">{quantity}</span>
-                            <button
-                                type="button"
-                                aria-label={`Add one ${product.name}`}
-                                disabled={pending || quantity >= product.stock}
-                                onClick={() => changeQuantity(product, quantity + 1)}
-                            >＋</button>
-                        </div>
-                    ) : (
-                        <button
-                            className="add-button"
-                            onClick={() => addProduct(product)}
-                            disabled={product.stock < 1 || pending}
+                        <Link
+                            to="/products"
+                            className={`product-art ${product.art}`}
+                            aria-label={`View ${product.name}`}
                         >
-                            {product.stock < 1 ? "Sold out" : "Add to bag"} <span>＋</span>
-                        </button>
-                    )}
+                            <img
+                                className="product-photo"
+                                src={
+                                    product.imageUrl ||
+                                    products[index % products.length].image
+                                }
+                                alt={product.name}
+                                loading="lazy"
+                            />
+                            <span className="art-index">
+                                0{index + 1} / made with care
+                            </span>
+                            <span className="art-orbit" />
+                        </Link>
+                        <div className="product-details">
+                            <div>
+                                <span className="product-maker">
+                                    {product.sellerID?.shopName ||
+                                        product.sellerID?.name ||
+                                        "Independent maker"}{" "}
+                                    · {product.category}
+                                </span>
+                                <h3>{product.name}</h3>
+                            </div>
+                            <strong>{formatPrice(product.price)}</strong>
+                        </div>
+                        {quantity > 0 ? (
+                            <div
+                                className="product-bag-quantity"
+                                role="group"
+                                aria-label={`${product.name} quantity in bag`}
+                            >
+                                <button
+                                    type="button"
+                                    aria-label={`Remove one ${product.name}`}
+                                    disabled={pending}
+                                    onClick={() =>
+                                        changeQuantity(product, quantity - 1)
+                                    }
+                                >
+                                    −
+                                </button>
+                                <span aria-live="polite">{quantity}</span>
+                                <button
+                                    type="button"
+                                    aria-label={`Add one ${product.name}`}
+                                    disabled={
+                                        pending || quantity >= product.stock
+                                    }
+                                    onClick={() =>
+                                        changeQuantity(product, quantity + 1)
+                                    }
+                                >
+                                    ＋
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                className="add-button"
+                                onClick={() => addProduct(product)}
+                                disabled={product.stock < 1 || pending}
+                            >
+                                {product.stock < 1 ? "Sold out" : "Add to bag"}{" "}
+                                <span>＋</span>
+                            </button>
+                        )}
                     </article>
                 );
             })}
-            {requestError && <p className="shop-state shop-state-error" role="alert">{requestError}</p>}
-            {notice && <p className="shop-state" role="status">{notice}</p>}
+            {requestError && (
+                <p className="shop-state shop-state-error" role="alert">
+                    {requestError}
+                </p>
+            )}
+            {notice && (
+                <p className="shop-state" role="status">
+                    {notice}
+                </p>
+            )}
         </div>
     );
 }
@@ -124,9 +173,7 @@ export function ShopPage() {
                 </Link>
                 <nav>
                     <Link to="/">Home</Link>
-                    <Link to="/cart">
-                        Bag · {count} <span className="bag-count">↗</span>
-                    </Link>
+                    <Link to="/cart">Bag ↗</Link>
                 </nav>
             </header>
             <main className="shop-main">
@@ -174,7 +221,11 @@ export function CartPage() {
                 <h1>
                     The <em>good stuff.</em>
                 </h1>
-                {error && <p className="shop-state shop-state-error" role="alert">{error}</p>}
+                {error && (
+                    <p className="shop-state shop-state-error" role="alert">
+                        {error}
+                    </p>
+                )}
                 {!cart.length ? (
                     <div className="empty-cart">
                         <span>✳</span>
@@ -195,7 +246,11 @@ export function CartPage() {
                                     <div
                                         className={`product-art cart-art ${item.art}`}
                                     >
-                                        <img className="product-photo" src={item.image} alt={item.name} />
+                                        <img
+                                            className="product-photo"
+                                            src={item.image}
+                                            alt={item.name}
+                                        />
                                     </div>
                                     <div className="cart-item-copy">
                                         <span className="product-maker">
@@ -204,20 +259,47 @@ export function CartPage() {
                                         <h3>{item.name}</h3>
                                         {!item.available && (
                                             <p className="shop-state shop-state-error">
-                                                Unavailable: {item.unavailableReason}. Remove it or lower the quantity to check out.
+                                                Unavailable:{" "}
+                                                {item.unavailableReason}. Remove
+                                                it or lower the quantity to
+                                                check out.
                                             </p>
                                         )}
                                         <div className="quantity-control">
                                             <button
                                                 aria-label="Remove one"
-                                                onClick={async () => { try { setError(""); await updateQuantity(item.id, item.quantity - 1); } catch (err) { setError(getApiError(err)); } }}
+                                                onClick={async () => {
+                                                    try {
+                                                        setError("");
+                                                        await updateQuantity(
+                                                            item.id,
+                                                            item.quantity - 1,
+                                                        );
+                                                    } catch (err) {
+                                                        setError(
+                                                            getApiError(err),
+                                                        );
+                                                    }
+                                                }}
                                             >
                                                 −
                                             </button>
                                             <span>{item.quantity}</span>
                                             <button
                                                 aria-label="Add one"
-                                                onClick={async () => { try { setError(""); await updateQuantity(item.id, item.quantity + 1); } catch (err) { setError(getApiError(err)); } }}
+                                                onClick={async () => {
+                                                    try {
+                                                        setError("");
+                                                        await updateQuantity(
+                                                            item.id,
+                                                            item.quantity + 1,
+                                                        );
+                                                    } catch (err) {
+                                                        setError(
+                                                            getApiError(err),
+                                                        );
+                                                    }
+                                                }}
                                             >
                                                 ＋
                                             </button>
@@ -225,10 +307,21 @@ export function CartPage() {
                                     </div>
                                     <div className="cart-item-price">
                                         <strong>
-                                            {formatPrice(item.price * item.quantity)}
+                                            {formatPrice(
+                                                item.price * item.quantity,
+                                            )}
                                         </strong>
                                         <button
-                                            onClick={async () => { try { setError(""); await removeFromCart(item.id); } catch (err) { setError(getApiError(err)); } }}
+                                            onClick={async () => {
+                                                try {
+                                                    setError("");
+                                                    await removeFromCart(
+                                                        item.id,
+                                                    );
+                                                } catch (err) {
+                                                    setError(getApiError(err));
+                                                }
+                                            }}
                                         >
                                             Remove
                                         </button>
@@ -253,7 +346,8 @@ export function CartPage() {
                             </div>
                             {hasUnavailable ? (
                                 <p className="shop-state shop-state-error">
-                                    Some items in your bag are unavailable. Update your bag to continue.
+                                    Some items in your bag are unavailable.
+                                    Update your bag to continue.
                                 </p>
                             ) : (
                                 <Link className="shop-cta" to="/checkout">
@@ -354,7 +448,9 @@ export function CheckoutPage() {
                                     required
                                     type="email"
                                     name="email"
-                                    defaultValue={user?.emailID || user?.email || ""}
+                                    defaultValue={
+                                        user?.emailID || user?.email || ""
+                                    }
                                     placeholder="alex@example.com"
                                 />
                             </label>
@@ -391,15 +487,37 @@ export function CheckoutPage() {
                                 <option value="COD">Pay on delivery</option>
                             </select>
                         </label>
-                        {error && <p className="shop-state shop-state-error" role="alert">{error}</p>}
-                        {unavailable.length > 0 && (
-                            <p className="shop-state shop-state-error" role="alert">
-                                Unavailable: {unavailable.map((item) => `${item.name} (${item.unavailableReason})`).join("; ")}.{" "}
-                                <Link to="/cart">Update your bag</Link>
+                        {error && (
+                            <p
+                                className="shop-state shop-state-error"
+                                role="alert"
+                            >
+                                {error}
                             </p>
                         )}
-                        <button className="shop-cta" disabled={loading || unavailable.length > 0}>
-                            {loading ? "Placing your order…" : `Place order · ${formatPrice(total)}`} <span>↗</span>
+                        {unavailable.length > 0 && (
+                            <p
+                                className="shop-state shop-state-error"
+                                role="alert"
+                            >
+                                Unavailable:{" "}
+                                {unavailable
+                                    .map(
+                                        (item) =>
+                                            `${item.name} (${item.unavailableReason})`,
+                                    )
+                                    .join("; ")}
+                                . <Link to="/cart">Update your bag</Link>
+                            </p>
+                        )}
+                        <button
+                            className="shop-cta"
+                            disabled={loading || unavailable.length > 0}
+                        >
+                            {loading
+                                ? "Placing your order…"
+                                : `Place order · ${formatPrice(total)}`}{" "}
+                            <span>↗</span>
                         </button>
                         <p className="summary-note">
                             Pay on delivery. Online payment is not enabled yet.
@@ -416,7 +534,9 @@ export function CheckoutPage() {
                                 <span>
                                     {item.name} × {item.quantity}
                                 </span>
-                                <strong>{formatPrice(item.price * item.quantity)}</strong>
+                                <strong>
+                                    {formatPrice(item.price * item.quantity)}
+                                </strong>
                             </div>
                         ))}
                         <div className="summary-total">
@@ -449,8 +569,16 @@ export function ConfirmationPage() {
                     It’s <em>official.</em>
                 </h1>
                 <p>
-                    Your order {order ? <strong>#{String(order._id || order.id).slice(-8)}</strong> : ""} is
-                    in. Someone’s about to make a little something just for you.
+                    Your order{" "}
+                    {order ? (
+                        <strong>
+                            #{String(order._id || order.id).slice(-8)}
+                        </strong>
+                    ) : (
+                        ""
+                    )}{" "}
+                    is in. Someone’s about to make a little something just for
+                    you.
                 </p>
                 <Link className="shop-cta" to="/products">
                     Find another favorite <span>↗</span>

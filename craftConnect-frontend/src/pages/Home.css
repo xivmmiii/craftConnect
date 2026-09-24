@@ -168,7 +168,7 @@ h2 em {
     display: inline-flex;
     gap: 17px;
     align-items: center;
-        
+
     padding: 15px 20px 15px 23px;
     background: var(--ink);
     color: white;
@@ -438,8 +438,7 @@ h2 {
     background: #ffffff;
 }
 .category-icon {
-    font-family: Georgia, serif;
-    font-size: 29px;
+    font-family: Georgia, serif;    
 }
 .card-arrow {
     align-self: end;

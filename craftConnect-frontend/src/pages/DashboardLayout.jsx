@@ -32,12 +32,10 @@ export default function DashboardLayout() {
                 <div className="profile-mini">
                     <span>{user?.role?.[0]?.toUpperCase()}</span>
                     <div>
-                        <strong>{user?.role}</strong>
-                        <small>CraftConnect member</small>
+                        <strong>{user?.role}</strong>                        
                     </div>
                 </div>
-                <nav className="dashboard-nav">
-                    <NavLink to={home}>Overview</NavLink>
+                <nav className="dashboard-nav">                    
                     {user?.role === "buyer" && (
                         <>
                             <NavLink to="/products">Discover goods</NavLink>
@@ -60,16 +58,9 @@ export default function DashboardLayout() {
                         </>
                     )}
                 </nav>
-                {user?.role === "buyer" && <Link className="sidebar-shop-link" to="/cart">Shopping bag <span>↗</span></Link>}
+              
                 <div className="dashboard-account">
-                    <Link
-                        className="dashboard-account-name"
-                        to={home}
-                        aria-label="Go to your dashboard"
-                        title={user?.name || user?.emailID || user?.email || user?.role}
-                    >
-                        {user?.name || user?.shopName || user?.emailID || user?.email || user?.role}
-                    </Link>
+                   
                     <button className="sidebar-logout" onClick={leave}>
                         Log out <span>↗</span>
                     </button>
@@ -80,10 +71,7 @@ export default function DashboardLayout() {
                     <Link to="/" className="back-home">
                         ← Back to home
                     </Link>
-                    <span className="dashboard-date">
-                        A little space for good things{" "}
-                        {user?.role === "buyer" && <Link to="/cart">Bag ↗</Link>}
-                    </span>
+                    
                 </header>
                 <Outlet />
                 <SiteFooter />

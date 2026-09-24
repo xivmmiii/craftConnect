@@ -33,7 +33,7 @@ export default function Home() {
                     <Link to="/products">Discover</Link>
                     <a href="#story">Our story</a>
                     <Link className="nav-bag" to="/cart">
-                        Bag · {bagCount} <span className="bag-count">↗</span>
+                        Bag ↗
                     </Link>
                     {user ? (
                         <>

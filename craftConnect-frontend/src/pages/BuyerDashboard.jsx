@@ -20,14 +20,7 @@ export default function BuyerDashboard() {
                     <span>Orders placed</span>
                     <strong>{String(orders.length).padStart(2, "0")}</strong>
                 </div>
-                <div>
-                    <span>Items in your bag</span>
-                    <strong>{String(cart.reduce((sum, item) => sum + item.quantity, 0)).padStart(2, "0")}</strong>
-                </div>
-                <div>
-                    <span>Order spend</span>
-                    <strong>{formatPrice(orders.reduce((sum, order) => sum + order.items.reduce((itemsTotal, item) => itemsTotal + item.price * item.qty, 0), 0))}</strong>
-                </div>
+                             
             </div>
             <section className="dashboard-panel">
                 <div className="panel-heading">
