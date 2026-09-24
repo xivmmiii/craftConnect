@@ -46,8 +46,7 @@ export default function DashboardLayout() {
                     {user?.role === "seller" && (
                         <>
                             <NavLink to="/my-products">My products</NavLink>
-                            <a href="#orders">Orders</a>
-                            <a href="#insights">Insights</a>
+                            <a href="#orders">Orders</a>                            
                         </>
                     )}
                     {user?.role === "admin" && (

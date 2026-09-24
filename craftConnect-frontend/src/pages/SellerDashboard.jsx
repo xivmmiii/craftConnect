@@ -120,10 +120,6 @@ export default function SellerDashboard() {
                         ).padStart(2, "0")}
                     </strong>
                 </div>
-                <div>
-                    <span>Units in stock</span>
-                    <strong>{String(inventory).padStart(2, "0")}</strong>
-                </div>
             </div>
 
             <section className="dashboard-panel" id="insights">
