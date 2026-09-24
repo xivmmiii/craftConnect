@@ -24,7 +24,7 @@ export default function SellerDashboard() {
     const [notice, setNotice] = useState("");
     const [requestError, setRequestError] = useState("");
     const activeCount = products.filter((product) => product.isActive).length;
-    const inventory = products.reduce((sum, product) => sum + product.stock, 0);
+    const showEmptyState = !formOpen && !loading && !error && products.length === 0;
 
     const submitListing = async (event) => {
         event.preventDefault();
@@ -130,16 +130,19 @@ export default function SellerDashboard() {
                         </p>
                         <h2>Made by you.</h2>
                     </div>
-                    <button
-                        className="seller-add-link"
-                        onClick={() => {
-                            setRequestError("");
-                            if (formOpen) closeForm();
-                            else setFormOpen(true);
-                        }}
-                    >
-                        {formOpen ? "Close" : "+ Add a listing"}
-                    </button>
+                    {/* The empty-state box below has its own "Add a listing" button. */}
+                    {!showEmptyState && (
+                        <button
+                            className="seller-add-link"
+                            onClick={() => {
+                                setRequestError("");
+                                if (formOpen) closeForm();
+                                else setFormOpen(true);
+                            }}
+                        >
+                            {formOpen ? "Close" : "+ Add a listing"}
+                        </button>
+                    )}
                 </div>
                 {requestError && (
                     <p
@@ -263,7 +266,8 @@ export default function SellerDashboard() {
                         </button>
                     </form>
                 )}
-                {loading ? (
+                {/* While adding or editing, the form takes the list's place. */}
+                {formOpen ? null : loading ? (
                     <p className="dashboard-message">Loading your listings…</p>
                 ) : error ? (
                     <p
