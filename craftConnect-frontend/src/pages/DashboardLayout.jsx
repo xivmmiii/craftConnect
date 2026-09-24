@@ -30,7 +30,7 @@ export default function DashboardLayout() {
                     <span>cc</span> craft<span>connect</span>
                 </Link>
                 <div className="profile-mini">
-                    <span>{user?.role?.[0]?.toUpperCase()}</span>
+                    <span>{(user?.name?.trim()[0] || user?.role?.[0] || "").toUpperCase()}</span>
                     <div>
                         <strong>{user?.role}</strong>                        
                     </div>
@@ -74,7 +74,7 @@ export default function DashboardLayout() {
                     
                 </header>
                 <Outlet />
-                <SiteFooter />
+                <SiteFooter showNav={false} />
             </main>
         </div>
     );

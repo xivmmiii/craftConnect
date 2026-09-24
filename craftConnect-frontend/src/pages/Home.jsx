@@ -11,8 +11,7 @@ const categories = [
 ];
 
 export default function Home() {
-    const { user, logout, cart } = useAuth();
-    const bagCount = cart.reduce((count, item) => count + item.quantity, 0);
+    const { user, logout } = useAuth();
     const dashboardPath =
         user?.role === "seller"
             ? "/seller"

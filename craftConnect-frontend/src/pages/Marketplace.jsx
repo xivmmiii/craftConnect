@@ -8,7 +8,7 @@ import SiteFooter from "../components/SiteFooter.jsx";
 import "./Shop.css";
 import { formatPrice } from "../utils/formatPrice.js";
 
-export function ProductGrid({ compact = false }) {
+export function ProductGrid({ compact = false, showBagQuantity = true }) {
     const { addToCart, updateQuantity, cart, user } = useAuth();
     const { products: listings, loading, error } = useProducts();
     const [notice, setNotice] = useState("");
@@ -67,7 +67,7 @@ export function ProductGrid({ compact = false }) {
             )}
             {listings.map((product, index) => {
                 const quantity =
-                    user?.role === "buyer"
+                    showBagQuantity && user?.role === "buyer"
                         ? cart.find((item) => item.id === product._id)
                               ?.quantity || 0
                         : 0;
@@ -163,8 +163,6 @@ export function ProductGrid({ compact = false }) {
 }
 
 export function ShopPage() {
-    const { cart } = useAuth();
-    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
     return (
         <div className="shop-page">
             <header className="shop-header">

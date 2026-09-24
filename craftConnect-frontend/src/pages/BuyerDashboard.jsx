@@ -4,7 +4,7 @@ import { ProductGrid } from "./Marketplace.jsx";
 import { formatPrice } from "../utils/formatPrice.js";
 
 export default function BuyerDashboard() {
-    const { user, orders, cart } = useAuth();
+    const { user, orders } = useAuth();
     return (
         <div className="dashboard-content">
             <p className="dashboard-kicker">Your little corner</p>
@@ -21,19 +21,7 @@ export default function BuyerDashboard() {
                     <strong>{String(orders.length).padStart(2, "0")}</strong>
                 </div>
                              
-            </div>
-            <section className="dashboard-panel">
-                <div className="panel-heading">
-                    <div>
-                        <p className="dashboard-kicker">Picked with care</p>
-                        <h2>Made for keeping.</h2>
-                    </div>
-                    <Link to="/products">
-                        Shop all <span>↗</span>
-                    </Link>
-                </div>
-                <ProductGrid compact />
-            </section>
+            </div>         
             <section className="dashboard-panel" id="orders">
                 <div className="panel-heading">
                     <div>
