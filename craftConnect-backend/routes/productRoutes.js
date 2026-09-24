@@ -2,6 +2,7 @@ import express from "express";
 import verifyToken from "../middleware/verifyToken.js";
 import {
     getAllProducts,
+    getMyProducts,
     getProductById,
     createProduct,
     updateProduct,
@@ -14,6 +15,7 @@ import { editProductSchema } from "../validators/editProductValidator.js";
 const router = express.Router();
 
 router.get("/", getAllProducts);
+router.get("/my", verifyToken, getMyProducts);
 router.get("/:id", getProductById);
 router.post("/", verifyToken, validate(createProductSchema), createProduct);
 router.put("/:id", verifyToken, validate(editProductSchema), updateProduct);

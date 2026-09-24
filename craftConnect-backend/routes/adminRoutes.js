@@ -3,17 +3,51 @@ import {
     getAllUsers,
     getAllProducts,
     getAllOrders,
-    removeProduct,
-    removeSeller,
+    deactivateUser,
+    activateUser,
+    getDashboardSummary,
+    createUser,
+    updateUser,
+    deleteUser,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    createOrder,
+    updateOrder,
+    deleteOrder,
 } from "../controllers/adminController.js";
 import verifyToken from "../middleware/verifyToken.js";
+import requireRole from "../middleware/requireRole.js";
+import validate from "../middleware/validate.js";
+import {
+    adminCreateUserSchema,
+    adminUpdateUserSchema,
+    adminCreateProductSchema,
+    adminUpdateProductSchema,
+    adminCreateOrderSchema,
+    adminUpdateOrderSchema,
+} from "../validators/adminValidator.js";
 
 const router = express.Router();
+router.use(verifyToken, requireRole("admin"));
 
-router.get("/user", verifyToken, getAllUsers);
-router.get("/product", verifyToken, getAllProducts);
-router.get("/order", verifyToken, getAllOrders);
-router.put("/seller/:id", verifyToken, removeSeller);
-router.put("/product/:id", verifyToken, removeProduct);
+router.get("/summary", getDashboardSummary);
+
+router.get("/user", getAllUsers);
+router.post("/user", validate(adminCreateUserSchema), createUser);
+router.put("/user/:id", validate(adminUpdateUserSchema), updateUser);
+router.delete("/user/:id", deleteUser);
+router.put("/user/:id/deactivate", deactivateUser);
+router.put("/user/:id/activate", activateUser);
+
+router.get("/product", getAllProducts);
+router.post("/product", validate(adminCreateProductSchema), createProduct);
+router.put("/product/:id", validate(adminUpdateProductSchema), updateProduct);
+router.delete("/product/:id", deleteProduct);
+
+router.get("/order", getAllOrders);
+router.post("/order", validate(adminCreateOrderSchema), createOrder);
+router.put("/order/:id", validate(adminUpdateOrderSchema), updateOrder);
+router.delete("/order/:id", deleteOrder);
 
 export default router;

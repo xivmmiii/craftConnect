@@ -4,6 +4,7 @@ const validate = (schema) => (req, res, next) => {
         const message = result.error.issues.map((e) => e.message).join(", ");
         return res.status(400).json({ message });
     }
+    req.body = result.data;
     next();
 };
 

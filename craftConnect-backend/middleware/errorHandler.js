@@ -1,6 +1,9 @@
+import AppError from "../utils/AppError.js";
+
 const errorHandler = (err, req, res, next) => {
-    console.error(err.stack);
-    let statusCode = err.statusCode || 500;
+    if (res.headersSent) return next(err);
+
+    let statusCode = err.statusCode || err.status || 500;
     let message = err.message || "Internal server error";
 
     if (err.name === "CastError") {
@@ -17,9 +20,21 @@ const errorHandler = (err, req, res, next) => {
             .map((val) => val.message)
             .join(", ");
     }
+    if (err.type === "entity.parse.failed") {
+        statusCode = 400;
+        message = "Request body is not valid JSON";
+    }
+
+    // Never leak internal details (driver errors, stack info) to clients.
+    if (statusCode >= 500) {
+        console.error(err.stack || err);
+        statusCode = 500;
+        message = "Internal server error";
+    }
 
     return res.status(statusCode).json({
         message,
+        ...(err instanceof AppError && err.code ? { code: err.code } : {}),
     });
 };
 

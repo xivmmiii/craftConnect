@@ -2,3 +2,8 @@
 **/.env
 *.log
 .DS_Store
+# Local tooling
+.firebase/
+.agents/
+.claude/
+skills-lock.json

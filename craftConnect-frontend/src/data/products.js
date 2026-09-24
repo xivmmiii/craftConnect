@@ -1,0 +1,38 @@
+export const products = [
+    {
+        id: "mug",
+        name: "Sunday morning mug",
+        maker: "Mara Studio",
+        price: 38,
+        category: "Ceramics",
+        art: "art-clay",
+        image: "https://images.unsplash.com/photo-1536936812504-0e77dc3f0b40?auto=format&fit=crop&w=900&q=85",
+    },
+    {
+        id: "tote",
+        name: "Everywhere market tote",
+        maker: "Soft Corner",
+        price: 54,
+        category: "Textiles",
+        art: "art-red",
+        image: "https://images.unsplash.com/photo-1768734837394-182f596e84ac?auto=format&fit=crop&w=900&q=85",
+    },
+    {
+        id: "vase",
+        name: "Small-batch bud vase",
+        maker: "Nico Ceramics",
+        price: 46,
+        category: "Home",
+        art: "art-blue",
+        image: "https://images.unsplash.com/photo-1703289803868-46a991580783?auto=format&fit=crop&w=900&q=85",
+    },
+    {
+        id: "candle",
+        name: "After rain candle",
+        maker: "Field Notes Co.",
+        price: 32,
+        category: "Objects",
+        art: "art-yellow",
+        image: "https://images.unsplash.com/photo-1629184225670-f5d2bdc8e1a7?auto=format&fit=crop&w=900&q=85",
+    },
+];

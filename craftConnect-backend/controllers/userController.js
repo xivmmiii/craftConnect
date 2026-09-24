@@ -1,30 +1,36 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import AppError from "../utils/AppError.js";
+import { setAuthCookie, clearAuthCookie } from "../utils/authCookie.js";
+import { createEmailToken, hashToken } from "../utils/tokens.js";
+import { sendMail, appUrl } from "../utils/mailer.js";
+
+const RESET_TTL_MS = 30 * 60 * 1000;
+
+// Compared against when the email is unknown so sign-in takes the same time either way.
+const DUMMY_HASH = bcrypt.hashSync("craftconnect-timing-equaliser", 10);
+
+const publicUser = (user) => ({
+    id: user._id,
+    name: user.name,
+    emailID: user.emailID,
+    role: user.role,
+    shopName: user.shopName,
+});
 
 export const Signin = async (req, res, next) => {
     try {
         const { emailID, password } = req.body;
         const user = await User.findOne({ emailID });
-        if (user && user.isActive === true) {
-            const password_matches = await bcrypt.compare(
-                password,
-                user.password,
-            );
-            if (password_matches) {
-                const token = jwt.sign(
-                    { id: user._id, role: user.role },
-                    process.env.JWT_SECRET,
-                    { expiresIn: "7d" },
-                );
-                return res.status(200).json({
-                    message: "sign in successful",
-                    token: token,
-                });
-            }
-        }
-        throw new AppError("Wrong ID or password", 401);
+        const passwordMatches = await bcrypt.compare(password, user?.password ?? DUMMY_HASH);
+        if (!user || !passwordMatches || user.isActive !== true)
+            throw new AppError("Wrong email or password", 401);
+
+        setAuthCookie(req, res, user);
+        return res.status(200).json({
+            message: "sign in successful",
+            user: publicUser(user),
+        });
     } catch (error) {
         next(error);
     }
@@ -32,11 +38,7 @@ export const Signin = async (req, res, next) => {
 
 export const Signup = async (req, res, next) => {
     try {
-        const { name, emailID, password, role, shippingAddress, shopName } =
-            req.body;
-        if (role === "admin") {
-            throw new AppError("Admin accounts cannot be created publicly", 403);
-        }
+        const { name, emailID, password, role, shippingAddress, shopName } = req.body;
         const user = await User.create({
             name,
             emailID,
@@ -45,24 +47,76 @@ export const Signup = async (req, res, next) => {
             shippingAddress,
             shopName,
         });
-        if (user)
-            console.log(
-                `User created successfully: ${user.name} (${user.emailID})`,
-            );
-        const token = jwt.sign(
-            { id: user._id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" },
-        );
+
+        setAuthCookie(req, res, user);
         return res.status(201).json({
-            name: name,
-            emailID: emailID,
-            role: role,
-            shippingAddress: shippingAddress,
-            shopName: shopName,
-            token: token,
+            message: "sign up successful",
+            user: publicUser(user),
+        });
+    } catch (error) {
+        if (error.code === 11000)
+            return next(new AppError("An account with this email already exists", 409));
+        next(error);
+    }
+};
+
+export const forgotPassword = async (req, res, next) => {
+    try {
+        const user = await User.findOne({ emailID: req.body.emailID, isActive: true });
+        if (user) {
+            const { token, hash, expires } = createEmailToken(RESET_TTL_MS);
+            user.passwordResetTokenHash = hash;
+            user.passwordResetExpires = expires;
+            await user.save();
+            await sendMail({
+                to: user.emailID,
+                subject: "Reset your CraftConnect password",
+                text: `Hi ${user.name},\n\nReset your password here:\n${appUrl(`/reset-password#token=${token}`)}\n\nThis link expires in 30 minutes. If you didn't ask for this, you can ignore this email.`,
+            });
+        }
+        return res.status(200).json({
+            message: "If an account exists for that email, a reset link is on its way.",
         });
     } catch (error) {
         next(error);
     }
+};
+
+export const resetPassword = async (req, res, next) => {
+    try {
+        const user = await User.findOne({
+            passwordResetTokenHash: hashToken(req.body.token),
+            passwordResetExpires: { $gt: new Date() },
+        });
+        if (!user || !user.isActive)
+            throw new AppError("This reset link is invalid or has expired", 400);
+
+        user.password = req.body.password;
+        user.passwordResetTokenHash = undefined;
+        user.passwordResetExpires = undefined;
+        user.tokenVersion = (user.tokenVersion ?? 0) + 1; // sign out every existing session
+        await user.save();
+
+        clearAuthCookie(req, res);
+        return res.status(200).json({
+            message: "Password updated. Please sign in with your new password.",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getMe = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) throw new AppError("User not found", 404);
+        return res.status(200).json({ user: publicUser(user) });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const Signout = (req, res) => {
+    clearAuthCookie(req, res);
+    return res.status(200).json({ message: "signed out" });
 };

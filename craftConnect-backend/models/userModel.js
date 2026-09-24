@@ -5,11 +5,15 @@ const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        trim: true,
+        maxlength: 80,
     },
     emailID: {
         type: String,
         required: true,
         unique: true,
+        lowercase: true,
+        trim: true,
     },
     password: {
         type: String,
@@ -29,6 +33,13 @@ const userSchema = new mongoose.Schema({
     isActive: {
         default: true,
         type: Boolean,
+    },
+    passwordResetTokenHash: { type: String, select: false },
+    passwordResetExpires: { type: Date, select: false },
+    // Embedded in each JWT; incrementing it revokes all existing sessions.
+    tokenVersion: {
+        type: Number,
+        default: 0,
     },
 });
 
