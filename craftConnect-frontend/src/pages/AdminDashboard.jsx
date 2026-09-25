@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import api, { getApiError } from "../services/api.js";
 import { OrdersManager, ProductsManager, UsersManager } from "./AdminManage.jsx";
 
@@ -7,10 +7,12 @@ export default function AdminDashboard() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const refreshVersion = useRef(0);
     // Bumped after any change so every panel reloads its list.
     const [version, setVersion] = useState(0);
 
     const refresh = useCallback(async () => {
+        const currentRefresh = ++refreshVersion.current;
         setLoading(true);
         setError("");
         try {
@@ -18,12 +20,14 @@ export default function AdminDashboard() {
                 api.get("/admin/summary"),
                 api.get("/admin/order", { params: { page: 1, limit: 5 } }),
             ]);
+            if (currentRefresh !== refreshVersion.current) return;
             setSummary(summaryResponse.data);
             setOrders(ordersResponse.data.orders || []);
         } catch (requestError) {
+            if (currentRefresh !== refreshVersion.current) return;
             setError(getApiError(requestError));
         } finally {
-            setLoading(false);
+            if (currentRefresh === refreshVersion.current) setLoading(false);
         }
     }, []);
 

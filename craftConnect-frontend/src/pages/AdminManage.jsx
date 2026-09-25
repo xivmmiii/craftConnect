@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import api, { getApiError } from "../services/api.js";
 import { formatPrice } from "../utils/formatPrice.js";
@@ -12,22 +12,29 @@ const PAYMENT_MODES = ["COD", "UPI", "netbanking", "card"];
 function usePagedList(endpoint, key, params, version) {
     const [page, setPage] = useState(1);
     const [state, setState] = useState({ items: [], total: 0, totalPages: 1, loading: true, error: "" });
+    const requestVersion = useRef(0);
     const query = JSON.stringify(params);
 
     const load = useCallback(async () => {
+        const currentRequest = ++requestVersion.current;
         setState((current) => ({ ...current, loading: true, error: "" }));
         try {
             const { data } = await api.get(endpoint, { params: { page, limit: PAGE_SIZE, ...JSON.parse(query) } });
+            if (currentRequest !== requestVersion.current) return;
             const totalKey = `total${key[0].toUpperCase()}${key.slice(1)}`;
             if (!data[key].length && page > 1) return setPage(page - 1);
             setState({ items: data[key], total: data[totalKey], totalPages: Math.max(data.totalPages, 1), loading: false, error: "" });
         } catch (error) {
+            if (currentRequest !== requestVersion.current) return;
             setState((current) => ({ ...current, loading: false, error: getApiError(error) }));
         }
     }, [endpoint, key, page, query]);
 
     useEffect(() => {
         void Promise.resolve().then(load);
+        return () => {
+            requestVersion.current += 1;
+        };
     }, [load, version]);
 
     return { ...state, page, setPage };
