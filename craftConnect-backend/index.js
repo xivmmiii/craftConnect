@@ -22,6 +22,7 @@ const allowedOrigins = [
     "http://localhost:5173",
     "https://craftconnect-gg.web.app",
     "https://craftconnect-gg.firebaseapp.com",
+    "https://craftconnect-gg.web.app",
     process.env.FRONTEND_URL,
 ].filter(Boolean);
 app.use(
@@ -53,7 +54,9 @@ app.use("/order", orderRoutes);
 app.use("/admin", adminRoutes);
 
 app.use((req, res) => {
-    res.status(404).json({ message: `Route not found: ${req.method} ${req.path}` });
+    res.status(404).json({
+        message: `Route not found: ${req.method} ${req.path}`,
+    });
 });
 
 app.use(errorHandler);
